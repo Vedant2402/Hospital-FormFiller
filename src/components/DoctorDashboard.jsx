@@ -45,10 +45,22 @@ const DoctorDashboard = () => {
       }
 
       const querySnapshot = await getDocs(q);
-      const patients = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      const patients = querySnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          patientId: data.patientId,
+          name: data.personalInfo?.name || '',
+          age: data.personalInfo?.age || '',
+          gender: data.personalInfo?.gender || '',
+          address: data.personalInfo?.address || '',
+          email: data.contactInfo?.email || '',
+          phoneNumber: data.contactInfo?.phoneNumber || '',
+          medicalHistory: data.medicalHistory || '',
+          createdAt: data.createdAt,
+          updatedAt: data.updatedAt
+        };
+      });
 
       if (isNextPage) {
         setAllPatients(prev => [...prev, ...patients]);

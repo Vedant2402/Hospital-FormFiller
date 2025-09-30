@@ -189,9 +189,19 @@ const PatientForm = () => {
       // Generate unique patient ID
       const patientId = generatePatientId();
       
-      // Prepare data for Firestore
+      // Prepare data for Firestore (structured)
       const patientData = {
-        ...formData,
+        personalInfo: {
+          name: formData.name,
+          age: formData.age,
+          gender: formData.gender,
+          address: formData.address
+        },
+        contactInfo: {
+          email: formData.email,
+          phoneNumber: formData.phoneNumber
+        },
+        medicalHistory: formData.medicalHistory || '', // optional
         patientId,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -209,14 +219,18 @@ const PatientForm = () => {
         // Continue even if notifications fail
       }
 
-      // Navigate to confirmation page with patient ID as route param; still pass state for convenience
-      navigate(`/confirmation/${patientId}`, { 
-        state: { 
-          patientId, 
-          email: formData.email,
-          phoneNumber: formData.phoneNumber 
-        } 
-      });
+      // Debug log for navigation
+      console.log('Navigating to confirmation page with patientId:', patientId);
+      // Robust navigation to confirmation page
+      setTimeout(() => {
+        navigate(`/confirmation/${patientId}`, {
+          state: {
+            patientId,
+            email: formData.email,
+            phoneNumber: formData.phoneNumber
+          }
+        });
+      }, 100);
 
     } catch (error) {
       console.error('Error submitting form:', error);

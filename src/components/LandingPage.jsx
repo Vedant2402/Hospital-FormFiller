@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useRef } from 'react';
 // navigation handled via Link inside GlassCard
-import { Stethoscope, UserPlus, FileText } from 'lucide-react';
+import { Stethoscope, UserPlus, FileText, Mail, Phone } from 'lucide-react';
 import GlassCard from './GlassCard';
 
 const LandingPage = () => {
   // no local navigation needed
+
+  const helplineRef = useRef(null);
 
   return (
   <div className="min-h-dvh bg-gradient-to-br from-white via-primary-50 to-medical-50">
@@ -26,19 +28,20 @@ const LandingPage = () => {
       </header>
 
       {/* Main Content */}
-  <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16 ar-tight-py ar-loose-py" style={{ minHeight: 'calc(100dvh - 4rem)' }}>
+  <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-20 ar-tight-py ar-loose-py" style={{ minHeight: 'calc(100dvh - 4rem)' }}>
         {/* Hero */}
-        <section className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight mb-4">
+        <section className="text-center mb-14 anim-fade-in">
+          <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight mb-4 anim-fade-up">
             Welcome to <span className="text-primary-600">HealthCare Portal</span>
           </h2>
-          <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto anim-fade-up anim-delay-1">
             Choose an option to continue. Designed for clarity and speed in a clinical environment.
           </p>
         </section>
 
+        
         {/* Two Options */}
-  <section className="grid gap-8 md:grid-cols-2 max-w-4xl mx-auto ar-card-grid ar-wide-grid">
+  <section className="grid gap-9 md:gap-10 md:grid-cols-2 max-w-4xl mx-auto ar-card-grid ar-wide-grid anim-fade-scale anim-delay-1">
           <GlassCard
             href="/doctor-login"
             icon={<Stethoscope className="h-12 w-12 text-primary-600" />}
@@ -53,6 +56,35 @@ const LandingPage = () => {
             description="Submit your medical information securely through our online form."
             buttonText="Fill Out Form"
           />
+        </section>
+
+        {/* Centered Help Button below cards */}
+  <div className="flex justify-center mt-8 anim-fade-up anim-delay-2">
+          <button
+            onClick={() => helplineRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+            className="glass-button hover-lift px-6 py-3 shadow-lg ring-1 ring-white/60"
+            aria-label="Scroll to IT Helpline information"
+          >
+            Need Help? View IT Helpline
+          </button>
+        </div>
+
+        {/* IT Helpline (below cards, pushed further down) */}
+        <section className="mt-24 md:mt-32 anim-fade-scale anim-delay-3" ref={helplineRef} id="it-helpline">
+          <div className="glass-card max-w-3xl mx-auto text-center">
+            <h3 className="text-xl font-semibold text-gray-900">IT Helpline</h3>
+            <p className="text-gray-600 mt-1 mb-4">Having trouble? Our hospital IT support can help you access or submit forms.</p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center text-sm">
+              <div className="flex items-center justify-center">
+                <Phone className="h-4 w-4 mr-2 text-gray-500" />
+                <span>+1 (555) 123-HELP</span>
+              </div>
+              <div className="flex items-center justify-center">
+                <Mail className="h-4 w-4 mr-2 text-gray-500" />
+                <span>support@medicare-portal.com</span>
+              </div>
+            </div>
+          </div>
         </section>
       </main>
 

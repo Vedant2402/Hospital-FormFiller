@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../config/firebase';
 import { Stethoscope, Mail, Lock, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 
@@ -11,6 +11,23 @@ const DoctorLogin = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  // Temporary registration function for doctor demo account
+  const handleRegisterDoctor = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      await createUserWithEmailAndPassword(auth, 'doctor@demo.com', 'demo123');
+      setError('Doctor account registered! You can now log in.');
+    } catch (error) {
+      if (error.code === 'auth/email-already-in-use') {
+        setError('Doctor account already exists. You can log in.');
+      } else {
+        setError('Registration failed: ' + error.message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -143,7 +160,7 @@ const DoctorLogin = () => {
             </button>
           </form>
 
-          {/* Demo Credentials */}
+          {/* Demo Credentials & Register Button */}
           <div className="mt-8 p-4 bg-gray-50 rounded-lg">
             <h4 className="text-sm font-medium text-gray-900 mb-2">Demo Credentials:</h4>
             <p className="text-sm text-gray-600">
@@ -152,9 +169,17 @@ const DoctorLogin = () => {
             <p className="text-sm text-gray-600">
               Password: <code className="bg-white px-2 py-1 rounded">demo123</code>
             </p>
+            {/* <button
+              type="button"
+              onClick={handleRegisterDoctor}
+              className="btn-primary w-full mt-4"
+              disabled={loading}
+            >
+              {/* {loading ? 'Registering...' : 'Register Doctor Demo Account'} */}
+            {/* </button> */}
             <p className="text-xs text-gray-500 mt-2">
-              Note: Create this account in Firebase Authentication to test the system.
-            </p>
+              Note: Click to create this account in Firebase Authentication for testing. Remove after registration.
+            </p> 
           </div>
         </div>
 
