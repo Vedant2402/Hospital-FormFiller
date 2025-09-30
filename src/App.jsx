@@ -4,7 +4,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from './config/firebase';
 import LandingPage from './components/LandingPage';
 import DoctorLogin from './components/DoctorLogin';
-import PatientForm from './components/PatientForm';
+import PatientFormPage from './components/PatientFormPage';
 import ConfirmationPage from './components/ConfirmationPage';
 import DoctorDashboard from './components/DoctorDashboard';
 
@@ -34,8 +34,8 @@ function App() {
           {/* Public Routes */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/doctor-login" element={<DoctorLogin />} />
-          <Route path="/patient-form" element={<PatientForm />} />
-          <Route path="/confirmation" element={<ConfirmationPage />} />
+          <Route path="/patient-form" element={<PatientFormPage />} />
+          <Route path="/confirmation/:id?" element={<ConfirmationPage />} />
           
           {/* Protected Routes */}
           <Route 
