@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { CheckCircle, Mail, MessageSquare, Copy, Home } from 'lucide-react';
+import { CircleCheck as CheckCircle, Mail, MessageSquare, Copy, Hop as Home } from 'lucide-react';
 
 const ConfirmationPage = () => {
   const location = useLocation();

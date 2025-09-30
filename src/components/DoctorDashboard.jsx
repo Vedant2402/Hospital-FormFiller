@@ -4,23 +4,7 @@ import { signOut } from 'firebase/auth';
 import { collection, query, where, getDocs, doc, updateDoc, orderBy, limit, startAfter } from 'firebase/firestore';
 import { auth, db } from '../config/firebase';
 import { validatePatientId } from '../utils/patientId';
-import { 
-  Search, 
-  LogOut, 
-  User, 
-  Edit3, 
-  Save, 
-  X, 
-  ChevronLeft, 
-  ChevronRight,
-  Stethoscope,
-  Mail,
-  Phone,
-  MapPin,
-  Calendar,
-  FileText,
-  Users
-} from 'lucide-react';
+import { Search, LogOut, User, CreditCard as Edit3, Save, X, ChevronLeft, ChevronRight, Stethoscope, Mail, Phone, MapPin, Calendar, FileText, Users } from 'lucide-react';
 
 const DoctorDashboard = () => {
   const [searchTerm, setSearchTerm] = useState('');
