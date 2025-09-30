@@ -12,6 +12,7 @@ const DoctorLogin = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   // Temporary registration function for doctor demo account
+  // eslint-disable-next-line no-unused-vars
   const handleRegisterDoctor = async () => {
     setLoading(true);
     setError('');

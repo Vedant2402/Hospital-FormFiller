@@ -221,6 +221,17 @@ const PatientForm = () => {
 
       // Debug log for navigation
       console.log('Navigating to confirmation page with patientId:', patientId);
+      // Clear form fields after successful submission
+      setFormData({
+        name: '',
+        age: '',
+        gender: '',
+        address: '',
+        email: '',
+        phoneNumber: '',
+        medicalHistory: ''
+      });
+      setErrors({});
       // Robust navigation to confirmation page
       setTimeout(() => {
         navigate(`/confirmation/${patientId}`, {
