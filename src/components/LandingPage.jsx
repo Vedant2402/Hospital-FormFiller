@@ -7,7 +7,7 @@ const LandingPage = () => {
   // no local navigation needed
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-primary-50 to-medical-50">
+  <div className="min-h-dvh bg-gradient-to-br from-white via-primary-50 to-medical-50">
       {/* Glass Header - fixed */}
       <header className="glass-header">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -26,7 +26,7 @@ const LandingPage = () => {
       </header>
 
       {/* Main Content */}
-  <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16 ar-tight-py ar-loose-py">
+  <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16 ar-tight-py ar-loose-py" style={{ minHeight: 'calc(100dvh - 4rem)' }}>
         {/* Hero */}
         <section className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight mb-4">

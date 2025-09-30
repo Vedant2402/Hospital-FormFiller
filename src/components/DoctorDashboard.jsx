@@ -13,7 +13,7 @@ const DoctorDashboard = () => {
   const [loading, setLoading] = useState(false);
   const [editingPatient, setEditingPatient] = useState(null);
   const [editFormData, setEditFormData] = useState({});
-  const [currentPage, setCurrentPage] = useState(1);
+  // pagination states handled via lastDoc/hasMore
   const [lastDoc, setLastDoc] = useState(null);
   const [hasMore, setHasMore] = useState(true);
   const navigate = useNavigate();
@@ -21,7 +21,9 @@ const DoctorDashboard = () => {
   const PATIENTS_PER_PAGE = 10;
 
   useEffect(() => {
+    // initial load
     loadPatients();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadPatients = async (isNextPage = false) => {
@@ -330,7 +332,7 @@ const DoctorDashboard = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-medical-50">
+    <div className="min-h-dvh bg-gradient-to-br from-primary-50 via-white to-medical-50">
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -355,7 +357,7 @@ const DoctorDashboard = () => {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ minHeight: 'calc(100dvh - 4rem)' }}>
         {/* Search Section */}
         <div className="card mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Search Patients</h2>
