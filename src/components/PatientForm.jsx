@@ -14,7 +14,44 @@ const PatientForm = () => {
     address: '',
     email: '',
     phoneNumber: '',
-    medicalHistory: ''
+    medicalHistory: '',
+    // Prior Authorization: Insurance
+    healthPlan: '',
+    healthPlanFax: '',
+    // Prior Authorization: Service Types
+    serviceTypes: [], // array of strings
+    otherServiceType: '',
+    // Prior Authorization: Provider Information
+    requestingProviderNameNPI: '',
+    requestingProviderPhone: '',
+    requestingProviderFax: '',
+    servicingProviderNameNPITaxId: '',
+    servicingProviderPhone: '',
+    servicingProviderFax: '',
+    sameAsRequestingProvider: false,
+    servicingFacilityNameNPI: '',
+    servicingFacilityPhone: '',
+    servicingFacilityFax: '',
+    sameAsRequestingProviderFacility: false,
+    contactPerson: '',
+    // Prior Authorization: Member Information
+    dob: '',
+    healthInsuranceId: '',
+    otherInsurance: '',
+    patientAccountNumber: '',
+    memberAddress: '',
+    // Prior Authorization: Diagnosis/Procedure
+    principalDiagnosisDescription: '',
+    principalDiagnosisICD10: '',
+    secondaryDiagnosisDescription: '',
+    secondaryDiagnosisICD10: '',
+    principalPlannedProcedureDescriptionCPT: '',
+    principalUnitsNumber: '',
+    principalUnitsType: '', // Hours | Days | Months | Visits | Dosage
+    secondaryPlannedProcedureDescriptionCPT: '',
+    secondaryUnitsNumber: '',
+    secondaryUnitsType: '',
+    serviceStartDate: ''
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -152,6 +189,36 @@ const PatientForm = () => {
     }
   };
 
+  // Toggle checkbox for multi-select service types
+  const toggleServiceType = (service) => {
+    setFormData((prev) => {
+      const exists = prev.serviceTypes.includes(service);
+      const next = exists
+        ? prev.serviceTypes.filter((s) => s !== service)
+        : [...prev.serviceTypes, service];
+      return { ...prev, serviceTypes: next };
+    });
+  };
+
+  // Handle boolean toggles that may copy values
+  const handleCheckboxChange = (e) => {
+    const { name, checked } = e.target;
+    setFormData((prev) => {
+      const update = { ...prev, [name]: checked };
+      if (name === 'sameAsRequestingProvider' && checked) {
+        update.servicingProviderNameNPITaxId = prev.requestingProviderNameNPI;
+        update.servicingProviderPhone = prev.requestingProviderPhone;
+        update.servicingProviderFax = prev.requestingProviderFax;
+      }
+      if (name === 'sameAsRequestingProviderFacility' && checked) {
+        update.servicingFacilityNameNPI = prev.requestingProviderNameNPI;
+        update.servicingFacilityPhone = prev.requestingProviderPhone;
+        update.servicingFacilityFax = prev.requestingProviderFax;
+      }
+      return update;
+    });
+  };
+
   const validateForm = () => {
     const newErrors = {};
 
@@ -202,6 +269,56 @@ const PatientForm = () => {
           phoneNumber: formData.phoneNumber
         },
         medicalHistory: formData.medicalHistory || '', // optional
+        priorAuthorization: {
+          insurance: {
+            healthPlan: formData.healthPlan,
+            healthPlanFax: formData.healthPlanFax,
+          },
+          serviceTypes: {
+            selected: formData.serviceTypes,
+            other: formData.otherServiceType,
+          },
+          providerInformation: {
+            requestingProviderNameNPI: formData.requestingProviderNameNPI,
+            requestingProviderPhone: formData.requestingProviderPhone,
+            requestingProviderFax: formData.requestingProviderFax,
+            servicingProviderNameNPITaxId: formData.servicingProviderNameNPITaxId,
+            servicingProviderPhone: formData.servicingProviderPhone,
+            servicingProviderFax: formData.servicingProviderFax,
+            sameAsRequestingProvider: formData.sameAsRequestingProvider,
+            servicingFacilityNameNPI: formData.servicingFacilityNameNPI,
+            servicingFacilityPhone: formData.servicingFacilityPhone,
+            servicingFacilityFax: formData.servicingFacilityFax,
+            sameAsRequestingProviderFacility: formData.sameAsRequestingProviderFacility,
+            contactPerson: formData.contactPerson,
+          },
+          memberInformation: {
+            patientName: formData.name,
+            gender: formData.gender,
+            dob: formData.dob,
+            healthInsuranceId: formData.healthInsuranceId,
+            otherInsurance: formData.otherInsurance,
+            patientAccountNumber: formData.patientAccountNumber,
+            address: formData.memberAddress || formData.address,
+          },
+          diagnosisAndProcedure: {
+            principalDiagnosisDescription: formData.principalDiagnosisDescription,
+            principalDiagnosisICD10: formData.principalDiagnosisICD10,
+            secondaryDiagnosisDescription: formData.secondaryDiagnosisDescription,
+            secondaryDiagnosisICD10: formData.secondaryDiagnosisICD10,
+            principalPlannedProcedureDescriptionCPT: formData.principalPlannedProcedureDescriptionCPT,
+            principalUnits: {
+              number: formData.principalUnitsNumber,
+              type: formData.principalUnitsType,
+            },
+            secondaryPlannedProcedureDescriptionCPT: formData.secondaryPlannedProcedureDescriptionCPT,
+            secondaryUnits: {
+              number: formData.secondaryUnitsNumber,
+              type: formData.secondaryUnitsType,
+            },
+            serviceStartDate: formData.serviceStartDate,
+          },
+        },
         patientId,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -229,7 +346,39 @@ const PatientForm = () => {
         address: '',
         email: '',
         phoneNumber: '',
-        medicalHistory: ''
+        medicalHistory: '',
+        healthPlan: '',
+        healthPlanFax: '',
+        serviceTypes: [],
+        otherServiceType: '',
+        requestingProviderNameNPI: '',
+        requestingProviderPhone: '',
+        requestingProviderFax: '',
+        servicingProviderNameNPITaxId: '',
+        servicingProviderPhone: '',
+        servicingProviderFax: '',
+        sameAsRequestingProvider: false,
+        servicingFacilityNameNPI: '',
+        servicingFacilityPhone: '',
+        servicingFacilityFax: '',
+        sameAsRequestingProviderFacility: false,
+        contactPerson: '',
+        dob: '',
+        healthInsuranceId: '',
+        otherInsurance: '',
+        patientAccountNumber: '',
+        memberAddress: '',
+        principalDiagnosisDescription: '',
+        principalDiagnosisICD10: '',
+        secondaryDiagnosisDescription: '',
+        secondaryDiagnosisICD10: '',
+        principalPlannedProcedureDescriptionCPT: '',
+        principalUnitsNumber: '',
+        principalUnitsType: '',
+        secondaryPlannedProcedureDescriptionCPT: '',
+        secondaryUnitsNumber: '',
+        secondaryUnitsType: '',
+        serviceStartDate: ''
       });
       setErrors({});
       // Robust navigation to confirmation page
@@ -252,7 +401,7 @@ const PatientForm = () => {
   };
 
   return (
-    <div className="card">
+    <div className="card w-full">
           {/* Header */}
           <div className="text-center mb-8">
             <div className="bg-medical-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -270,15 +419,33 @@ const PatientForm = () => {
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-8 lg:space-y-10">
+            {/* Insurance Section (Prior Authorization) */}
+            <div className="bg-gray-50 rounded-xl p-6 lg:p-8 border border-gray-100">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <FileText className="h-5 w-5 mr-2 text-medical-600" />
+                Prior Authorization - Insurance
+              </h3>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                <div>
+                  <label htmlFor="healthPlan" className="form-label">Health Plan</label>
+                  <input id="healthPlan" name="healthPlan" type="text" value={formData.healthPlan} onChange={handleInputChange} className="form-input" placeholder="Plan name" />
+                </div>
+                <div>
+                  <label htmlFor="healthPlanFax" className="form-label">Health Plan Fax #</label>
+                  <input id="healthPlanFax" name="healthPlanFax" type="text" value={formData.healthPlanFax} onChange={handleInputChange} className="form-input" placeholder="(###) ###-####" />
+                </div>
+              </div>
+            </div>
+
             {/* Personal Information Section */}
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div className="bg-gray-50 rounded-xl p-6 lg:p-8 border border-gray-100">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                 <User className="h-5 w-5 mr-2 text-medical-600" />
                 Personal Information
               </h3>
               
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                 <div>
                   <label htmlFor="name" className="form-label">
                     Full Name *
@@ -335,6 +502,14 @@ const PatientForm = () => {
                     </button>
                   </div>
                   {errors.age && <p className="text-red-600 text-sm mt-1">{errors.age}</p>}
+                </div>
+
+                <div>
+                  <label htmlFor="dob" className="form-label">Date of Birth</label>
+                  <div className="relative">
+                    <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <input id="dob" name="dob" type="date" value={formData.dob} onChange={handleInputChange} className="form-input pl-10" />
+                  </div>
                 </div>
 
                 <div>
@@ -399,8 +574,152 @@ const PatientForm = () => {
               </div>
             </div>
 
+            {/* Service Type Requiring Authorization */}
+            <div className="bg-gray-50 rounded-xl p-6 lg:p-8 border border-gray-100">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <FileText className="h-5 w-5 mr-2 text-medical-600" />
+                Service Type Requiring Authorization
+              </h3>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 text-sm">
+                {[
+                  'Ambulatory/Outpatient Service',
+                  'Surgery/Procedure',
+                  'Infusion or Chemotherapy',
+                  'Diagnostic',
+                  'Home Health',
+                  'Infusion Therapy (Home)',
+                  'Hospice Care',
+                  'Respite Care',
+                  'Transportation (Non-emergent)',
+                  'Air Ambulance',
+                  'Acupuncture',
+                  'Chiropractic',
+                  'Durable Medical Equipment',
+                  'Non-Participating Specialist',
+                  'Acute Medical/Surgical',
+                  'Long Term Acute Care',
+                  'Rehabilitation',
+                  'Skilled Nursing Facility',
+                  'Adjunctive Dental Services',
+                  'Oral Surgery',
+                  'Maxillofacial Prosthetics',
+                  'Enteral Nutrition',
+                  'Parenteral Nutrition',
+                  'Total Parenteral Nutrition',
+                  'Outpatient Therapy - Occupational',
+                  'Outpatient Therapy - Physical',
+                  'Outpatient Therapy - Cardio Pulmonary Rehab',
+                  'Outpatient Therapy - Speech',
+                ].map((s) => (
+                  <label key={s} className="flex items-center space-x-2">
+                    <input type="checkbox" className="form-checkbox" checked={formData.serviceTypes.includes(s)} onChange={() => toggleServiceType(s)} />
+                    <span>{s}</span>
+                  </label>
+                ))}
+              </div>
+              <div className="mt-4">
+                <label htmlFor="otherServiceType" className="form-label">Other — please specify</label>
+                <input id="otherServiceType" name="otherServiceType" type="text" value={formData.otherServiceType} onChange={handleInputChange} className="form-input" placeholder="Other service type" />
+              </div>
+            </div>
+
+            {/* Provider Information */}
+            <div className="bg-gray-50 rounded-xl p-6 lg:p-8 border border-gray-100">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <FileText className="h-5 w-5 mr-2 text-medical-600" />
+                Provider Information
+              </h3>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                <div>
+                  <label htmlFor="requestingProviderNameNPI" className="form-label">Requesting Provider Name and NPI</label>
+                  <input id="requestingProviderNameNPI" name="requestingProviderNameNPI" type="text" value={formData.requestingProviderNameNPI} onChange={handleInputChange} className="form-input" placeholder="Name, NPI" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="requestingProviderPhone" className="form-label">Phone</label>
+                    <input id="requestingProviderPhone" name="requestingProviderPhone" type="tel" value={formData.requestingProviderPhone} onChange={handleInputChange} className="form-input" placeholder="(###) ###-####" />
+                  </div>
+                  <div>
+                    <label htmlFor="requestingProviderFax" className="form-label">Fax</label>
+                    <input id="requestingProviderFax" name="requestingProviderFax" type="text" value={formData.requestingProviderFax} onChange={handleInputChange} className="form-input" placeholder="(###) ###-####" />
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="servicingProviderNameNPITaxId" className="form-label">Servicing Provider Name and NPI (and Tax ID if required)</label>
+                  <input id="servicingProviderNameNPITaxId" name="servicingProviderNameNPITaxId" type="text" value={formData.servicingProviderNameNPITaxId} onChange={handleInputChange} className="form-input" placeholder="Name, NPI, Tax ID" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="servicingProviderPhone" className="form-label">Phone</label>
+                    <input id="servicingProviderPhone" name="servicingProviderPhone" type="tel" value={formData.servicingProviderPhone} onChange={handleInputChange} className="form-input" placeholder="(###) ###-####" />
+                  </div>
+                  <div>
+                    <label htmlFor="servicingProviderFax" className="form-label">Fax</label>
+                    <input id="servicingProviderFax" name="servicingProviderFax" type="text" value={formData.servicingProviderFax} onChange={handleInputChange} className="form-input" placeholder="(###) ###-####" />
+                  </div>
+                </div>
+
+                <div className="md:col-span-2 lg:col-span-3 flex items-center space-x-3">
+                  <input id="sameAsRequestingProvider" name="sameAsRequestingProvider" type="checkbox" className="form-checkbox" checked={formData.sameAsRequestingProvider} onChange={handleCheckboxChange} />
+                  <label htmlFor="sameAsRequestingProvider" className="text-sm text-gray-700">Servicing Provider same as Requesting Provider</label>
+                </div>
+
+                <div>
+                  <label htmlFor="servicingFacilityNameNPI" className="form-label">Servicing Facility Name and NPI</label>
+                  <input id="servicingFacilityNameNPI" name="servicingFacilityNameNPI" type="text" value={formData.servicingFacilityNameNPI} onChange={handleInputChange} className="form-input" placeholder="Facility Name, NPI" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="servicingFacilityPhone" className="form-label">Phone</label>
+                    <input id="servicingFacilityPhone" name="servicingFacilityPhone" type="tel" value={formData.servicingFacilityPhone} onChange={handleInputChange} className="form-input" placeholder="(###) ###-####" />
+                  </div>
+                  <div>
+                    <label htmlFor="servicingFacilityFax" className="form-label">Fax</label>
+                    <input id="servicingFacilityFax" name="servicingFacilityFax" type="text" value={formData.servicingFacilityFax} onChange={handleInputChange} className="form-input" placeholder="(###) ###-####" />
+                  </div>
+                </div>
+
+                <div className="md:col-span-2 lg:col-span-3 flex items-center space-x-3">
+                  <input id="sameAsRequestingProviderFacility" name="sameAsRequestingProviderFacility" type="checkbox" className="form-checkbox" checked={formData.sameAsRequestingProviderFacility} onChange={handleCheckboxChange} />
+                  <label htmlFor="sameAsRequestingProviderFacility" className="text-sm text-gray-700">Servicing Facility same as Requesting Provider</label>
+                </div>
+
+                <div className="md:col-span-2 lg:col-span-3">
+                  <label htmlFor="contactPerson" className="form-label">Contact Person</label>
+                  <input id="contactPerson" name="contactPerson" type="text" value={formData.contactPerson} onChange={handleInputChange} className="form-input" placeholder="Name of contact person" />
+                </div>
+              </div>
+            </div>
+
+            {/* Member Information (Prior Authorization) */}
+            <div className="bg-gray-50 rounded-xl p-6 lg:p-8 border border-gray-100">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <FileText className="h-5 w-5 mr-2 text-medical-600" />
+                Member Information (Prior Authorization)
+              </h3>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                <div>
+                  <label htmlFor="healthInsuranceId" className="form-label">Health Insurance ID#</label>
+                  <input id="healthInsuranceId" name="healthInsuranceId" type="text" value={formData.healthInsuranceId} onChange={handleInputChange} className="form-input" placeholder="ID number" />
+                </div>
+                <div>
+                  <label htmlFor="patientAccountNumber" className="form-label">Patient Account/Control Number</label>
+                  <input id="patientAccountNumber" name="patientAccountNumber" type="text" value={formData.patientAccountNumber} onChange={handleInputChange} className="form-input" placeholder="Account number" />
+                </div>
+                <div>
+                  <label htmlFor="otherInsurance" className="form-label">If other insurance, please specify</label>
+                  <input id="otherInsurance" name="otherInsurance" type="text" value={formData.otherInsurance} onChange={handleInputChange} className="form-input" placeholder="Other insurance provider" />
+                </div>
+                <div>
+                  <label htmlFor="memberAddress" className="form-label">Member Address (defaults to Address)</label>
+                  <input id="memberAddress" name="memberAddress" type="text" value={formData.memberAddress} onChange={handleInputChange} className="form-input" placeholder={formData.address || 'Address'} />
+                </div>
+              </div>
+            </div>
+
             {/* Contact Information Section */}
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div className="bg-gray-50 rounded-xl p-6 lg:p-8 border border-gray-100">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                 <Mail className="h-5 w-5 mr-2 text-medical-600" />
                 Contact Information
@@ -466,7 +785,7 @@ const PatientForm = () => {
             </div>
 
             {/* Medical History Section */}
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div className="bg-gray-50 rounded-xl p-6 lg:p-8 border border-gray-100">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                 <FileText className="h-5 w-5 mr-2 text-medical-600" />
                 Medical History
@@ -498,6 +817,82 @@ const PatientForm = () => {
                 <p className="text-sm text-gray-500 mt-2">
                   Include any allergies, current medications, chronic conditions, or previous surgeries.
                 </p>
+              </div>
+            </div>
+
+            {/* Diagnosis/Planned Procedure Information */}
+            <div className="bg-gray-50 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <FileText className="h-5 w-5 mr-2 text-medical-600" />
+                Diagnosis / Planned Procedure Information
+              </h3>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="principalDiagnosisDescription" className="form-label">Principal Diagnosis Description</label>
+                  <input id="principalDiagnosisDescription" name="principalDiagnosisDescription" type="text" value={formData.principalDiagnosisDescription} onChange={handleInputChange} className="form-input" />
+                </div>
+                <div>
+                  <label htmlFor="principalDiagnosisICD10" className="form-label">ICD-10 Codes</label>
+                  <input id="principalDiagnosisICD10" name="principalDiagnosisICD10" type="text" value={formData.principalDiagnosisICD10} onChange={handleInputChange} className="form-input" placeholder="e.g., E11.9" />
+                </div>
+                <div>
+                  <label htmlFor="secondaryDiagnosisDescription" className="form-label">Secondary Diagnosis Description</label>
+                  <input id="secondaryDiagnosisDescription" name="secondaryDiagnosisDescription" type="text" value={formData.secondaryDiagnosisDescription} onChange={handleInputChange} className="form-input" />
+                </div>
+                <div>
+                  <label htmlFor="secondaryDiagnosisICD10" className="form-label">ICD-10 Codes</label>
+                  <input id="secondaryDiagnosisICD10" name="secondaryDiagnosisICD10" type="text" value={formData.secondaryDiagnosisICD10} onChange={handleInputChange} className="form-input" />
+                </div>
+
+                <div className="md:col-span-2 grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label htmlFor="principalPlannedProcedureDescriptionCPT" className="form-label">Principal Planned Procedure (Description and CPT/HCPCS Code)</label>
+                    <input id="principalPlannedProcedureDescriptionCPT" name="principalPlannedProcedureDescriptionCPT" type="text" value={formData.principalPlannedProcedureDescriptionCPT} onChange={handleInputChange} className="form-input" placeholder="Description, CPT/HCPCS" />
+                  </div>
+                  <div>
+                    <label className="form-label"># of Units Being Requested</label>
+                    <div className="grid grid-cols-3 gap-3">
+                      <input name="principalUnitsNumber" type="number" value={formData.principalUnitsNumber} onChange={handleInputChange} className="form-input" placeholder="#" />
+                      <select name="principalUnitsType" value={formData.principalUnitsType} onChange={handleInputChange} className="form-input">
+                        <option value="">Select</option>
+                        <option value="Hours">Hours</option>
+                        <option value="Days">Days</option>
+                        <option value="Months">Months</option>
+                        <option value="Visits">Visits</option>
+                        <option value="Dosage">Dosage</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="md:col-span-2 grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label htmlFor="secondaryPlannedProcedureDescriptionCPT" className="form-label">Secondary Planned Procedure (Description and CPT/HCPCS Code)</label>
+                    <input id="secondaryPlannedProcedureDescriptionCPT" name="secondaryPlannedProcedureDescriptionCPT" type="text" value={formData.secondaryPlannedProcedureDescriptionCPT} onChange={handleInputChange} className="form-input" placeholder="Description, CPT/HCPCS" />
+                  </div>
+                  <div>
+                    <label className="form-label"># of Units Being Requested</label>
+                    <div className="grid grid-cols-3 gap-3">
+                      <input name="secondaryUnitsNumber" type="number" value={formData.secondaryUnitsNumber} onChange={handleInputChange} className="form-input" placeholder="#" />
+                      <select name="secondaryUnitsType" value={formData.secondaryUnitsType} onChange={handleInputChange} className="form-input">
+                        <option value="">Select</option>
+                        <option value="Hours">Hours</option>
+                        <option value="Days">Days</option>
+                        <option value="Months">Months</option>
+                        <option value="Visits">Visits</option>
+                        <option value="Dosage">Dosage</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="md:col-span-2">
+                  <label htmlFor="serviceStartDate" className="form-label">Service Start Date</label>
+                  <div className="relative max-w-xs">
+                    <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <input id="serviceStartDate" name="serviceStartDate" type="date" value={formData.serviceStartDate} onChange={handleInputChange} className="form-input pl-10" />
+                  </div>
+                </div>
               </div>
             </div>
 
