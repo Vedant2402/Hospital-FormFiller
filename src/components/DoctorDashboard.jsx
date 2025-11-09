@@ -1,13 +1,40 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { signOut } from 'firebase/auth';
-import { collection, query, where, getDocs, doc, updateDoc, orderBy, limit, startAfter } from 'firebase/firestore';
-import { auth, db } from '../config/firebase';
-import { validatePatientId } from '../utils/patientId';
-import { Search, LogOut, User, CreditCard as Edit3, Save, X, ChevronLeft, ChevronRight, Stethoscope, Mail, Phone, MapPin, Calendar, FileText, Users } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+// import { signOut } from "firebase/auth";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
+  updateDoc,
+  orderBy,
+  limit,
+  startAfter,
+} from "firebase/firestore";
+import { db } from "../config/firebase";
+import { validatePatientId } from "../utils/patientId";
+import {
+  Search,
+  LogOut,
+  User,
+  CreditCard as Edit3,
+  Save,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Stethoscope,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  FileText,
+  Users,
+} from "lucide-react";
+import axios from "axios";
 
 const DoctorDashboard = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [allPatients, setAllPatients] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -30,40 +57,40 @@ const DoctorDashboard = () => {
     setLoading(true);
     try {
       let q = query(
-        collection(db, 'patients'),
-        orderBy('createdAt', 'desc'),
+        collection(db, "patients"),
+        orderBy("createdAt", "desc"),
         limit(PATIENTS_PER_PAGE)
       );
 
       if (isNextPage && lastDoc) {
         q = query(
-          collection(db, 'patients'),
-          orderBy('createdAt', 'desc'),
+          collection(db, "patients"),
+          orderBy("createdAt", "desc"),
           startAfter(lastDoc),
           limit(PATIENTS_PER_PAGE)
         );
       }
 
       const querySnapshot = await getDocs(q);
-      const patients = querySnapshot.docs.map(doc => {
+      const patients = querySnapshot.docs.map((doc) => {
         const data = doc.data();
         return {
           id: doc.id,
           patientId: data.patientId,
-          name: data.personalInfo?.name || '',
-          age: data.personalInfo?.age || '',
-          gender: data.personalInfo?.gender || '',
-          address: data.personalInfo?.address || '',
-          email: data.contactInfo?.email || '',
-          phoneNumber: data.contactInfo?.phoneNumber || '',
-          medicalHistory: data.medicalHistory || '',
+          name: data.personalInfo?.name || "",
+          age: data.personalInfo?.age || "",
+          gender: data.personalInfo?.gender || "",
+          address: data.personalInfo?.address || "",
+          email: data.contactInfo?.email || "",
+          phoneNumber: data.contactInfo?.phoneNumber || "",
+          medicalHistory: data.medicalHistory || "",
           createdAt: data.createdAt,
-          updatedAt: data.updatedAt
+          updatedAt: data.updatedAt,
         };
       });
 
       if (isNextPage) {
-        setAllPatients(prev => [...prev, ...patients]);
+        setAllPatients((prev) => [...prev, ...patients]);
       } else {
         setAllPatients(patients);
       }
@@ -71,7 +98,7 @@ const DoctorDashboard = () => {
       setLastDoc(querySnapshot.docs[querySnapshot.docs.length - 1]);
       setHasMore(querySnapshot.docs.length === PATIENTS_PER_PAGE);
     } catch (error) {
-      console.error('Error loading patients:', error);
+      console.error("Error loading patients:", error);
     } finally {
       setLoading(false);
     }
@@ -85,32 +112,36 @@ const DoctorDashboard = () => {
 
     setLoading(true);
     try {
-      const patientsRef = collection(db, 'patients');
+      const patientsRef = collection(db, "patients");
       let queries = [];
 
       // Search by Patient ID
       if (validatePatientId(searchTerm)) {
-        queries.push(query(patientsRef, where('patientId', '==', searchTerm)));
+        queries.push(query(patientsRef, where("patientId", "==", searchTerm)));
       }
 
       // Search by email
-      if (searchTerm.includes('@')) {
-        queries.push(query(patientsRef, where('email', '==', searchTerm.toLowerCase())));
+      if (searchTerm.includes("@")) {
+        queries.push(
+          query(patientsRef, where("email", "==", searchTerm.toLowerCase()))
+        );
       }
 
       // Search by phone number (exact match)
-      queries.push(query(patientsRef, where('phoneNumber', '==', searchTerm)));
+      queries.push(query(patientsRef, where("phoneNumber", "==", searchTerm)));
 
       // Search by name (case-insensitive partial match would require additional setup)
-      queries.push(query(patientsRef, where('name', '>=', searchTerm)));
-      queries.push(query(patientsRef, where('name', '<=', searchTerm + '\uf8ff')));
+      queries.push(query(patientsRef, where("name", ">=", searchTerm)));
+      queries.push(
+        query(patientsRef, where("name", "<=", searchTerm + "\uf8ff"))
+      );
 
       const results = [];
       for (const q of queries) {
         const querySnapshot = await getDocs(q);
-        querySnapshot.docs.forEach(doc => {
+        querySnapshot.docs.forEach((doc) => {
           const patientData = { id: doc.id, ...doc.data() };
-          if (!results.find(p => p.id === patientData.id)) {
+          if (!results.find((p) => p.id === patientData.id)) {
             results.push(patientData);
           }
         });
@@ -118,7 +149,7 @@ const DoctorDashboard = () => {
 
       setSearchResults(results);
     } catch (error) {
-      console.error('Error searching patients:', error);
+      console.error("Error searching patients:", error);
     } finally {
       setLoading(false);
     }
@@ -133,22 +164,22 @@ const DoctorDashboard = () => {
       address: patient.address,
       email: patient.email,
       phoneNumber: patient.phoneNumber,
-      medicalHistory: patient.medicalHistory || ''
+      medicalHistory: patient.medicalHistory || "",
     });
   };
 
   const handleSaveEdit = async () => {
     try {
-      const patientRef = doc(db, 'patients', editingPatient);
+      const patientRef = doc(db, "patients", editingPatient);
       await updateDoc(patientRef, {
         ...editFormData,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       });
 
       // Update local state
       const updatePatientInList = (patients) =>
-        patients.map(p => 
-          p.id === editingPatient 
+        patients.map((p) =>
+          p.id === editingPatient
             ? { ...p, ...editFormData, updatedAt: new Date() }
             : p
         );
@@ -158,16 +189,25 @@ const DoctorDashboard = () => {
       setEditingPatient(null);
       setEditFormData({});
     } catch (error) {
-      console.error('Error updating patient:', error);
+      console.error("Error updating patient:", error);
     }
   };
 
   const handleLogout = async () => {
     try {
-      await signOut(auth);
-      navigate('/');
+      const result = await axios.post("/api/auth/logout");
+      if (result.status === 200) {
+        // Clear localStorage
+        localStorage.removeItem("authToken");
+        navigate("/doctor-login");
+      } else {
+        console.error(
+          "Logout failed:",
+          result.data?.message || "Unknown error"
+        );
+      }
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error("Error signing out:", error);
     }
   };
 
@@ -184,17 +224,24 @@ const DoctorDashboard = () => {
                 <input
                   type="text"
                   value={editFormData.name}
-                  onChange={(e) => setEditFormData(prev => ({ ...prev, name: e.target.value }))}
+                  onChange={(e) =>
+                    setEditFormData((prev) => ({
+                      ...prev,
+                      name: e.target.value,
+                    }))
+                  }
                   className="form-input text-lg font-semibold"
                 />
               ) : (
                 patient.name
               )}
             </h3>
-            <p className="text-sm text-gray-600">Patient ID: {patient.patientId}</p>
+            <p className="text-sm text-gray-600">
+              Patient ID: {patient.patientId}
+            </p>
           </div>
         </div>
-        
+
         <div className="flex space-x-2">
           {isEditing ? (
             <>
@@ -234,7 +281,9 @@ const DoctorDashboard = () => {
               <input
                 type="number"
                 value={editFormData.age}
-                onChange={(e) => setEditFormData(prev => ({ ...prev, age: e.target.value }))}
+                onChange={(e) =>
+                  setEditFormData((prev) => ({ ...prev, age: e.target.value }))
+                }
                 className="form-input ml-2 text-sm w-20"
               />
             ) : (
@@ -248,7 +297,12 @@ const DoctorDashboard = () => {
             {isEditing ? (
               <select
                 value={editFormData.gender}
-                onChange={(e) => setEditFormData(prev => ({ ...prev, gender: e.target.value }))}
+                onChange={(e) =>
+                  setEditFormData((prev) => ({
+                    ...prev,
+                    gender: e.target.value,
+                  }))
+                }
                 className="form-input ml-2 text-sm"
               >
                 <option value="male">Male</option>
@@ -257,7 +311,9 @@ const DoctorDashboard = () => {
                 <option value="prefer-not-to-say">Prefer not to say</option>
               </select>
             ) : (
-              <span className="ml-2 text-sm font-medium capitalize">{patient.gender}</span>
+              <span className="ml-2 text-sm font-medium capitalize">
+                {patient.gender}
+              </span>
             )}
           </div>
 
@@ -268,7 +324,12 @@ const DoctorDashboard = () => {
               {isEditing ? (
                 <textarea
                   value={editFormData.address}
-                  onChange={(e) => setEditFormData(prev => ({ ...prev, address: e.target.value }))}
+                  onChange={(e) =>
+                    setEditFormData((prev) => ({
+                      ...prev,
+                      address: e.target.value,
+                    }))
+                  }
                   className="form-input ml-2 text-sm w-full mt-1"
                   rows="2"
                 />
@@ -287,7 +348,12 @@ const DoctorDashboard = () => {
               <input
                 type="email"
                 value={editFormData.email}
-                onChange={(e) => setEditFormData(prev => ({ ...prev, email: e.target.value }))}
+                onChange={(e) =>
+                  setEditFormData((prev) => ({
+                    ...prev,
+                    email: e.target.value,
+                  }))
+                }
                 className="form-input ml-2 text-sm flex-1"
               />
             ) : (
@@ -302,11 +368,18 @@ const DoctorDashboard = () => {
               <input
                 type="tel"
                 value={editFormData.phoneNumber}
-                onChange={(e) => setEditFormData(prev => ({ ...prev, phoneNumber: e.target.value }))}
+                onChange={(e) =>
+                  setEditFormData((prev) => ({
+                    ...prev,
+                    phoneNumber: e.target.value,
+                  }))
+                }
                 className="form-input ml-2 text-sm flex-1"
               />
             ) : (
-              <span className="ml-2 text-sm font-medium">{patient.phoneNumber}</span>
+              <span className="ml-2 text-sm font-medium">
+                {patient.phoneNumber}
+              </span>
             )}
           </div>
 
@@ -317,14 +390,19 @@ const DoctorDashboard = () => {
               {isEditing ? (
                 <textarea
                   value={editFormData.medicalHistory}
-                  onChange={(e) => setEditFormData(prev => ({ ...prev, medicalHistory: e.target.value }))}
+                  onChange={(e) =>
+                    setEditFormData((prev) => ({
+                      ...prev,
+                      medicalHistory: e.target.value,
+                    }))
+                  }
                   className="form-input ml-2 text-sm w-full mt-1"
                   rows="3"
                   placeholder="Enter medical history..."
                 />
               ) : (
                 <p className="ml-2 text-sm font-medium">
-                  {patient.medicalHistory || 'No medical history provided'}
+                  {patient.medicalHistory || "No medical history provided"}
                 </p>
               )}
             </div>
@@ -334,9 +412,15 @@ const DoctorDashboard = () => {
 
       <div className="mt-4 pt-4 border-t border-gray-100">
         <div className="flex justify-between text-xs text-gray-500">
-          <span>Created: {new Date(patient.createdAt?.toDate()).toLocaleDateString()}</span>
+          <span>
+            Created:{" "}
+            {new Date(patient.createdAt?.toDate()).toLocaleDateString()}
+          </span>
           {patient.updatedAt && (
-            <span>Updated: {new Date(patient.updatedAt?.toDate()).toLocaleDateString()}</span>
+            <span>
+              Updated:{" "}
+              {new Date(patient.updatedAt?.toDate()).toLocaleDateString()}
+            </span>
           )}
         </div>
       </div>
@@ -354,8 +438,12 @@ const DoctorDashboard = () => {
                 <Stethoscope className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Doctor Dashboard</h1>
-                <p className="text-sm text-gray-600">Patient Management System</p>
+                <h1 className="text-xl font-bold text-gray-900">
+                  Doctor Dashboard
+                </h1>
+                <p className="text-sm text-gray-600">
+                  Patient Management System
+                </p>
               </div>
             </div>
             <button
@@ -369,10 +457,15 @@ const DoctorDashboard = () => {
         </div>
       </header>
 
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ minHeight: 'calc(100dvh - 4rem)' }}>
+      <div
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+        style={{ minHeight: "calc(100dvh - 4rem)" }}
+      >
         {/* Search Section */}
         <div className="card mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Search Patients</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            Search Patients
+          </h2>
           <div className="flex space-x-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -380,7 +473,7 @@ const DoctorDashboard = () => {
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyPress={(e) => e.key === "Enter" && handleSearch()}
                 className="form-input pl-10"
                 placeholder="Search by Patient ID, Email, Phone, or Name..."
               />
@@ -390,12 +483,14 @@ const DoctorDashboard = () => {
               disabled={loading}
               className="btn-primary disabled:opacity-50"
             >
-              {loading ? 'Searching...' : 'Search'}
+              {loading ? "Searching..." : "Search"}
             </button>
           </div>
-          
+
           <div className="mt-4 text-sm text-gray-600">
-            <p><strong>Search Tips:</strong></p>
+            <p>
+              <strong>Search Tips:</strong>
+            </p>
             <ul className="list-disc list-inside mt-2 space-y-1">
               <li>Enter a 9-digit Patient ID for exact match</li>
               <li>Use complete email address for email search</li>
@@ -411,7 +506,7 @@ const DoctorDashboard = () => {
             <h3 className="text-xl font-bold text-gray-900 mb-4">
               Search Results ({searchResults.length})
             </h3>
-            {searchResults.map(patient => (
+            {searchResults.map((patient) => (
               <PatientCard
                 key={patient.id}
                 patient={patient}
@@ -433,7 +528,7 @@ const DoctorDashboard = () => {
                 disabled={loading}
                 className="btn-secondary disabled:opacity-50"
               >
-                {loading ? 'Loading...' : 'Load More'}
+                {loading ? "Loading..." : "Load More"}
               </button>
             )}
           </div>
@@ -441,12 +536,16 @@ const DoctorDashboard = () => {
           {allPatients.length === 0 ? (
             <div className="card text-center py-12">
               <User className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h4 className="text-lg font-medium text-gray-900 mb-2">No Patients Found</h4>
-              <p className="text-gray-600">No patient records are available in the system yet.</p>
+              <h4 className="text-lg font-medium text-gray-900 mb-2">
+                No Patients Found
+              </h4>
+              <p className="text-gray-600">
+                No patient records are available in the system yet.
+              </p>
             </div>
           ) : (
             <div>
-              {allPatients.map(patient => (
+              {allPatients.map((patient) => (
                 <PatientCard
                   key={patient.id}
                   patient={patient}

@@ -1,29 +1,54 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../config/firebase';
-import { Stethoscope, Mail, Lock, ArrowLeft, Eye, EyeOff } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
+// import {
+//   signInWithEmailAndPassword,
+//   createUserWithEmailAndPassword,
+// } from "firebase/auth";
+// import { auth } from "../config/firebase";
+import { Stethoscope, Mail, Lock, ArrowLeft, Eye, EyeOff } from "lucide-react";
+import axios from "axios";
 
 const DoctorLogin = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const navigate = useNavigate();
-  // Temporary registration function for doctor demo account
-  // eslint-disable-next-line no-unused-vars
+  const [isLoginForm, setIsLoginForm] = useState(true);
+
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      if (token && window.location.pathname !== "/doctor-dashboard") {
+        navigate("/doctor-dashboard");
+      }
+    }
+  }, [navigate]);
+
   const handleRegisterDoctor = async () => {
+    const apiUrl = "/api/auth/signup";
     setLoading(true);
-    setError('');
+    setError("");
     try {
-      await createUserWithEmailAndPassword(auth, 'doctor@demo.com', 'demo123');
-      setError('Doctor account registered! You can now log in.');
-    } catch (error) {
-      if (error.code === 'auth/email-already-in-use') {
-        setError('Doctor account already exists. You can log in.');
+      const res = await axios.post(apiUrl, {
+        email,
+        password,
+      });
+
+      if (res.status === 201 || res.status === 200) {
+        setError("Doctor account registered! You can now log in.");
       } else {
-        setError('Registration failed: ' + error.message);
+        setError(
+          "Registration failed: " + (res.data?.message || "Unexpected response")
+        );
+      }
+    } catch (err) {
+      const msg = err.response?.data?.message || err.message;
+      if (err.response?.status === 409) {
+        setError("Doctor account already exists. You can log in.");
+      } else {
+        setError("Registration failed: " + msg);
       }
     } finally {
       setLoading(false);
@@ -31,37 +56,47 @@ const DoctorLogin = () => {
   };
 
   const handleLogin = async (e) => {
-    e.preventDefault();
+    const apiUrl = "/api/auth/login";
+    if (e && typeof e.preventDefault === "function") e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      navigate('/doctor-dashboard');
-    } catch (error) {
-      setError(getErrorMessage(error.code));
+      const res = await axios.post(apiUrl, {
+        email,
+        password,
+      });
+
+      if (res.status === 200) {
+        // Store token if provided by backend
+        const { idToken } = res.data || {};
+        if (idToken) {
+          try {
+            localStorage.setItem("authToken", idToken);
+          } catch {
+            // ignore localStorage errors
+          }
+        }
+        navigate("/doctor-dashboard");
+      } else {
+        setError(
+          res.data?.message ||
+            "Login failed. Please check your credentials and try again."
+        );
+      }
+    } catch (err) {
+      const status = err.response?.status; // eslint-disable-line no-unused-vars
+      const msg = err.response?.data?.message || err.message;
+      setError(msg);
     } finally {
       setLoading(false);
     }
   };
 
-  const getErrorMessage = (errorCode) => {
-    switch (errorCode) {
-      case 'auth/user-not-found':
-        return 'No account found with this email address.';
-      case 'auth/wrong-password':
-        return 'Incorrect password. Please try again.';
-      case 'auth/invalid-email':
-        return 'Please enter a valid email address.';
-      case 'auth/too-many-requests':
-        return 'Too many failed attempts. Please try again later.';
-      default:
-        return 'Login failed. Please check your credentials and try again.';
-    }
-  };
+  // (old firebase error mapper removed — HTTP status-based messages are used instead)
 
   return (
-  <div className="min-h-dvh bg-gradient-to-br from-primary-50 via-white to-medical-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-dvh bg-gradient-to-br from-primary-50 via-white to-medical-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full">
         {/* Back Button */}
         <div className="mb-6">
@@ -81,7 +116,9 @@ const DoctorLogin = () => {
             <div className="bg-primary-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <Stethoscope className="h-8 w-8 text-primary-600" />
             </div>
-            <h2 className="text-3xl font-bold text-gray-900">Doctor Login</h2>
+            <h2 className="text-3xl font-bold text-gray-900">
+              Doctor {isLoginForm ? "Login" : "Registration"}
+            </h2>
             <p className="text-gray-600 mt-2">Access your medical dashboard</p>
           </div>
 
@@ -93,7 +130,10 @@ const DoctorLogin = () => {
           )}
 
           {/* Login Form */}
-          <form onSubmit={handleLogin} className="space-y-6">
+          <form
+            onSubmit={isLoginForm ? handleLogin : handleRegisterDoctor}
+            className="space-y-6"
+          >
             <div>
               <label htmlFor="email" className="form-label">
                 Email Address
@@ -124,7 +164,7 @@ const DoctorLogin = () => {
                 </div>
                 <input
                   id="password"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -153,42 +193,72 @@ const DoctorLogin = () => {
               {loading ? (
                 <div className="flex items-center justify-center">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                  Signing In...
+                  {isLoginForm ? "Signing In..." : "Registering..."}
                 </div>
+              ) : isLoginForm ? (
+                "Sign In"
               ) : (
-                'Sign In'
+                "Register"
               )}
             </button>
+
+            {/* Change to Register/Login Link */}
+            {
+              <div className="text-center">
+                <p className="text-sm text-gray-600">
+                  {isLoginForm
+                    ? "Don't have an account?"
+                    : "Already have an account?"}{" "}
+                  <button
+                    type="button"
+                    onClick={() => setIsLoginForm(!isLoginForm)}
+                    className="text-primary-600 hover:text-primary-700 font-medium"
+                  >
+                    {isLoginForm ? "Register" : "Login"}
+                  </button>
+                </p>
+              </div>
+            }
           </form>
 
           {/* Demo Credentials & Register Button */}
-          <div className="mt-8 p-4 bg-gray-50 rounded-lg">
-            <h4 className="text-sm font-medium text-gray-900 mb-2">Demo Credentials:</h4>
+          {/* <div className="mt-8 p-4 bg-gray-50 rounded-lg">
+            <h4 className="text-sm font-medium text-gray-900 mb-2">
+              Demo Credentials:
+            </h4>
             <p className="text-sm text-gray-600">
-              Email: <code className="bg-white px-2 py-1 rounded">doctor@demo.com</code>
+              Email:{" "}
+              <code className="bg-white px-2 py-1 rounded">
+                doctor@demo.com
+              </code>
             </p>
             <p className="text-sm text-gray-600">
-              Password: <code className="bg-white px-2 py-1 rounded">demo123</code>
+              Password:{" "}
+              <code className="bg-white px-2 py-1 rounded">demo123</code>
             </p>
-            {/* <button
+            <button
               type="button"
-              onClick={handleRegisterDoctor}
+              onClick={() => handleRegisterDoctor()}
               className="btn-primary w-full mt-4"
               disabled={loading}
             >
-              {/* {loading ? 'Registering...' : 'Register Doctor Demo Account'} */}
-            {/* </button> */}
+              {loading ? "Registering..." : "Register Doctor Demo Account"}
+            </button>
             <p className="text-xs text-gray-500 mt-2">
-              Note: Click to create this account in Firebase Authentication for testing. Remove after registration.
-            </p> 
-          </div>
+              Note: Click to create this account via the backend API for
+              testing. Remove after registration.
+            </p>
+          </div> */}
         </div>
 
         {/* Additional Info */}
         <div className="text-center mt-6">
           <p className="text-sm text-gray-600">
-            Having trouble accessing your account?{' '}
-            <a href="#" className="text-primary-600 hover:text-primary-700 font-medium">
+            Having trouble accessing your account?{" "}
+            <a
+              href="#"
+              className="text-primary-600 hover:text-primary-700 font-medium"
+            >
               Contact IT Support
             </a>
           </p>
