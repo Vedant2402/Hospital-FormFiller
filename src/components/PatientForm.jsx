@@ -1,7 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { collection, addDoc } from 'firebase/firestore';
-import { db } from '../config/firebase';
 import { generatePatientId } from '../utils/patientId';
 import { sendEmailNotification, sendSMSNotification } from '../utils/notifications';
 import { User, Mail, Phone, MapPin, FileText, Calendar, Users, Mic, MicOff } from 'lucide-react';

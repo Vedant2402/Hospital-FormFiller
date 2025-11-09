@@ -1,98 +1,6 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../config/firebase';
-import { Stethoscope, Mail, Lock, ArrowLeft, Eye, EyeOff } from 'lucide-react';
-
-const DoctorLogin = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const navigate = useNavigate();
-  // Temporary registration function for doctor demo account
-  // eslint-disable-next-line no-unused-vars
-  const handleRegisterDoctor = async () => {
-    setLoading(true);
-    setError('');
-    try {
-      await createUserWithEmailAndPassword(auth, 'doctor@demo.com', 'demo123');
-      setError('Doctor account registered! You can now log in.');
-    } catch (error) {
-      if (error.code === 'auth/email-already-in-use') {
-        setError('Doctor account already exists. You can log in.');
-      } else {
-        setError('Registration failed: ' + error.message);
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      navigate('/doctor-dashboard');
-    } catch (error) {
-      setError(getErrorMessage(error.code));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getErrorMessage = (errorCode) => {
-    switch (errorCode) {
-      case 'auth/user-not-found':
-        return 'No account found with this email address.';
-      case 'auth/wrong-password':
-        return 'Incorrect password. Please try again.';
-      case 'auth/invalid-email':
-        return 'Please enter a valid email address.';
-      case 'auth/too-many-requests':
-        return 'Too many failed attempts. Please try again later.';
-      default:
-        return 'Login failed. Please check your credentials and try again.';
-    }
-  };
-
-  return (
-  <div className="min-h-dvh bg-gradient-to-br from-primary-50 via-white to-medical-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full">
-        {/* Back Button */}
-        <div className="mb-6">
-          <Link
-            to="/"
-            className="inline-flex items-center text-primary-600 hover:text-primary-700 transition-colors duration-200"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Home
-          </Link>
-        </div>
-
-        {/* Login Card */}
-        <div className="card">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className="bg-primary-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Stethoscope className="h-8 w-8 text-primary-600" />
-            </div>
-            <h2 className="text-3xl font-bold text-gray-900">Doctor Login</h2>
-            <p className="text-gray-600 mt-2">Access your medical dashboard</p>
-          </div>
-
-          {/* Error Message */}
-          {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-              <p className="text-red-700 text-sm">{error}</p>
-            </div>
-          )}
-
-          {/* Login Form */}
+// Deprecated: DoctorLogin removed in patient-only flow. Placeholder export.
+export default function DoctorLogin() { return null; }
+const _deprecated_doctor_login = String.raw`
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
               <label htmlFor="email" className="form-label">
@@ -198,4 +106,4 @@ const DoctorLogin = () => {
   );
 };
 
-export default DoctorLogin;
+`;
