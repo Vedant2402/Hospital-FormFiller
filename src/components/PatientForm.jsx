@@ -1,9 +1,10 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { collection, addDoc } from 'firebase/firestore';
+import { db } from '../config/firebase';
 import { generatePatientId } from '../utils/patientId';
 import { sendEmailNotification, sendSMSNotification } from '../utils/notifications';
-import { User, Mail, Phone, MapPin, FileText, Calendar, Users, Mic, MicOff } from 'lucide-react';
+import { User, Mail, Phone, MapPin, FileText, Calendar, Users, Mic, MicOff, Upload, X } from 'lucide-react';
 
 const PatientForm = () => {
   const [formData, setFormData] = useState({
@@ -59,6 +60,11 @@ const PatientForm = () => {
   // Voice input state
   const recognitionRef = useRef(null);
   const [listeningField, setListeningField] = useState(null);
+
+  // PDF upload (UI only)
+  const pdfInputRef = useRef(null);
+  const [pdfName, setPdfName] = useState('');
+  const [pdfError, setPdfError] = useState('');
 
   const speak = (text) => {
     try {
@@ -170,6 +176,39 @@ const PatientForm = () => {
       if (recognitionRef.current) recognitionRef.current.stop();
     } catch { /* no-op */ }
     setListeningField(null);
+  };
+
+  // ===== PDF Upload (UI only) =====
+  const openPdfPicker = () => {
+    setPdfError('');
+    pdfInputRef.current?.click();
+  };
+
+  const onPdfSelected = (e) => {
+    setPdfError('');
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.type !== 'application/pdf') {
+      setPdfError('Please upload a PDF file (.pdf).');
+      setPdfName('');
+      return;
+    }
+    const maxBytes = 25 * 1024 * 1024; // 25 MB limit for UI
+    if (file.size > maxBytes) {
+      setPdfError('File is too large. Please select a PDF under 25 MB.');
+      setPdfName('');
+      return;
+    }
+    setPdfName(file.name);
+    // Parsing will be added later; UI only for now.
+  };
+
+  const clearPdf = () => {
+    setPdfName('');
+    setPdfError('');
+    if (pdfInputRef.current) {
+      pdfInputRef.current.value = '';
+    }
   };
 
   const handleInputChange = (e) => {
@@ -400,15 +439,50 @@ const PatientForm = () => {
   };
 
   return (
-    <div className="card w-full">
+    <div className="card w-full relative">
+          {/* Hidden file input for PDF selection */}
+          <input ref={pdfInputRef} type="file" accept="application/pdf" className="hidden" onChange={onPdfSelected} />
           {/* Header */}
           <div className="text-center mb-8">
+            {/* Top-right Upload button (UI only) */}
+            <div className="absolute right-4 top-4">
+              <button
+                type="button"
+                onClick={openPdfPicker}
+                className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                title="Upload Prior Authorization PDF"
+                aria-label="Upload Prior Authorization PDF"
+              >
+                <Upload className="h-4 w-4 text-medical-700" />
+                Upload PDF
+              </button>
+            </div>
             <div className="bg-medical-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <FileText className="h-8 w-8 text-medical-600" />
             </div>
             <h2 className="text-3xl font-bold text-gray-900">Patient Registration Form</h2>
             <p className="text-gray-600 mt-2">Please fill out all required information</p>
           </div>
+
+          {/* PDF selection status (UI only) */}
+          {pdfName && (
+            <div className="mb-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800 flex items-center justify-between">
+              <div>
+                <strong className="font-semibold">PDF selected:</strong> {pdfName}
+                <span className="ml-2 text-green-700">(Parsing will be performed later)</span>
+              </div>
+              <button type="button" onClick={clearPdf} className="inline-flex items-center gap-1 text-green-800 hover:text-green-900" aria-label="Clear selected PDF">
+                <X className="h-4 w-4" />
+                Clear
+              </button>
+            </div>
+          )}
+
+          {pdfError && (
+            <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {pdfError}
+            </div>
+          )}
 
           {/* Submit Error */}
           {errors.submit && (
