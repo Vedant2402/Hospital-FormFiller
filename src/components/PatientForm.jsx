@@ -434,27 +434,36 @@ const PatientForm = () => {
             onChange={handlePdfSelected}
           />
 
-          {/* Import PDF button at the top */}
-          <div className="mb-6 flex justify-center">
-            <button
-              type="button"
-              onClick={handlePdfUploadClick}
-              disabled={uploadingPdf}
-              className="btn-primary flex items-center gap-2 disabled:opacity-60"
-              title="Import a Prior Authorization PDF to auto-fill the form"
-            >
-              {uploadingPdf ? (
-                <>
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  Importing PDF...
-                </>
-              ) : (
-                <>
-                  <FileUp className="h-5 w-5" />
-                  Import PDF
-                </>
-              )}
-            </button>
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="bg-medical-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+              <FileText className="h-8 w-8 text-medical-600" />
+            </div>
+            <h2 className="text-3xl font-bold text-gray-900">Patient Registration Form</h2>
+            <p className="text-gray-600 mt-2">Please fill out all required information</p>
+
+            {/* Import PDF button below description */}
+            <div className="mt-4 flex justify-center">
+              <button
+                type="button"
+                onClick={handlePdfUploadClick}
+                disabled={uploadingPdf}
+                className="btn-primary flex items-center gap-2 disabled:opacity-60"
+                title="Import a Prior Authorization PDF to auto-fill the form"
+              >
+                {uploadingPdf ? (
+                  <>
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    Importing PDF...
+                  </>
+                ) : (
+                  <>
+                    <FileUp className="h-5 w-5" />
+                    Import PDF
+                  </>
+                )}
+              </button>
+            </div>
           </div>
 
           {/* Upload Error */}
@@ -463,15 +472,6 @@ const PatientForm = () => {
               <p className="text-red-700 text-sm">{uploadError}</p>
             </div>
           )}
-
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className="bg-medical-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-              <FileText className="h-8 w-8 text-medical-600" />
-            </div>
-            <h2 className="text-3xl font-bold text-gray-900">Patient Registration Form</h2>
-            <p className="text-gray-600 mt-2">Please fill out all required information</p>
-          </div>
 
           {/* Submit Error */}
           {errors.submit && (
