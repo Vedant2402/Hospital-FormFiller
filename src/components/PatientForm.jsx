@@ -346,6 +346,7 @@ const PatientForm = () => {
           },
         },
         patientId,
+        submittedAt: new Date().toISOString(),
         createdAt: new Date(),
         updatedAt: new Date()
       };
