@@ -9,12 +9,13 @@ function App() {
     <Router>
       <div className="App">
         <Routes>
-          {/* Simplified Public Routes (only patient flow) */}
+          {/* Public Routes */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/patient-form" element={<PatientFormPage />} />
           <Route path="/confirmation/:id?" element={<ConfirmationPage />} />
-          {/* Catch all route -> redirect to patient form */}
-          <Route path="*" element={<Navigate to="/patient-form" />} />
+          
+          {/* Catch all route */}
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </div>
     </Router>

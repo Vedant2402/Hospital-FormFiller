@@ -1,8 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { collection, addDoc } from 'firebase/firestore';
 import { generatePatientId } from '../utils/patientId';
-import { sendEmailNotification, sendSMSNotification } from '../utils/notifications';
 import { User, Mail, Phone, MapPin, FileText, Calendar, Users, Mic, MicOff } from 'lucide-react';
 
 const PatientForm = () => {
@@ -323,16 +321,13 @@ const PatientForm = () => {
         updatedAt: new Date()
       };
 
-      // Save to Firestore
-      await addDoc(collection(db, 'patients'), patientData);
-
-      // Send notifications
+      // Persist locally instead of Firestore (Firebase removed)
       try {
-        await sendEmailNotification(formData.email, patientId);
-        await sendSMSNotification(formData.phoneNumber, patientId);
-      } catch (notificationError) {
-        console.error('Notification sending failed:', notificationError);
-        // Continue even if notifications fail
+        const existing = JSON.parse(localStorage.getItem('patients') || '[]');
+        existing.push(patientData);
+        localStorage.setItem('patients', JSON.stringify(existing));
+      } catch (storageError) {
+        console.error('Local persistence failed:', storageError);
       }
 
       // Debug log for navigation

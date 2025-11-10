@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 // navigation handled via Link inside GlassCard
-import { Stethoscope, FileText, Mail, Phone } from 'lucide-react';
+import { Stethoscope, UserPlus, FileText, Mail, Phone } from 'lucide-react';
 import GlassCard from './GlassCard';
 
 const LandingPage = () => {
@@ -40,8 +40,8 @@ const LandingPage = () => {
         </section>
 
         
-        {/* Single Option: Patient Form */}
-        <section className="max-w-3xl mx-auto anim-fade-scale anim-delay-1">
+        {/* Main Action */}
+  <section className="grid gap-9 md:gap-10 max-w-2xl mx-auto ar-card-grid anim-fade-scale anim-delay-1">
           <GlassCard
             href="/patient-form"
             icon={<FileText className="h-12 w-12 text-medical-700" />}

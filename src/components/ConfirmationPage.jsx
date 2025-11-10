@@ -1,17 +1,22 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useParams, Link } from 'react-router-dom';
-import { CircleCheck as CheckCircle } from 'lucide-react';
+import { CheckCircle, Home } from 'lucide-react';
 
 const ConfirmationPage = () => {
   const location = useLocation();
-  const params = useParams();
-  const routeId = params.id;
-  const { patientId: stateId } = location.state || {};
-  const patientId = stateId || routeId;
+  const { id } = useParams();
+  const { patientId: navPatientId } = location.state || {};
+  const [record, setRecord] = useState(null);
+
+  useEffect(() => {
+    const all = JSON.parse(localStorage.getItem('patients') || '[]');
+    const found = all.find(p => p.patientId === (navPatientId || id));
+    setRecord(found || null);
+  }, [navPatientId, id]);
 
   // No clipboard interactions in this simplified confirmation view
 
-  if (!patientId) {
+  if (!record) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-medical-50 via-white to-primary-50 flex items-center justify-center py-12 px-4">
         <div className="glass-card max-w-md w-full text-center">
@@ -31,15 +36,37 @@ const ConfirmationPage = () => {
         </div>
         <h2 className="text-2xl font-extrabold text-gray-900">Submission Successful!</h2>
         <p className="text-gray-600 mt-1">Thank you for providing your information. Your patient record has been created.</p>
+            {record && (
+              <p className="text-gray-500 text-sm mt-2">Stored locally only. Patient ID: <span className="font-semibold">{record.patientId}</span></p>
+            )}
 
-        <div className="mt-6 bg-white/70 border border-white/60 rounded-md p-4">
-          <p className="text-sm text-gray-600 mb-1">Please keep your Patient ID for future reference:</p>
-          <p className="text-2xl font-bold tracking-widest text-gray-900 font-mono">{patientId}</p>
-        </div>
+              {record && (
+                <div className="bg-gray-50 rounded-lg p-6 mb-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Submission Details</h3>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Patient ID:</span>
+                      <span className="font-medium text-gray-900">{record.patientId}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Name:</span>
+                      <span className="font-medium text-gray-900">{record.personalInfo?.name}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Email:</span>
+                      <span className="font-medium text-gray-900">{record.contactInfo?.email}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Phone:</span>
+                      <span className="font-medium text-gray-900">{record.contactInfo?.phoneNumber}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
 
-        <p className="text-sm text-gray-500 pt-3">
-          A confirmation with your Patient ID has been sent to your email and phone (if configured).
-        </p>
+        {!record && (
+          <p className="text-sm text-gray-500 pt-3">No record data found.</p>
+        )}
 
         <Link to="/" className="btn-primary mt-6 w-full max-w-xs mx-auto inline-flex justify-center">
           Return to Home
