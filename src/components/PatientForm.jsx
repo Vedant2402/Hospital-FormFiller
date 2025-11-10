@@ -1,7 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { generatePatientId } from '../utils/patientId';
-import { User, Mail, Phone, MapPin, FileText, Calendar, Users, Mic, MicOff } from 'lucide-react';
+import { importPreAuthPdf } from '../utils/pdfImport';
+import { User, Mail, Phone, MapPin, FileText, Calendar, Users, Mic, MicOff, FileUp, Loader2 } from 'lucide-react';
+
 
 const PatientForm = () => {
   const [formData, setFormData] = useState({
@@ -51,11 +53,14 @@ const PatientForm = () => {
     serviceStartDate: ''
   });
   const [loading, setLoading] = useState(false);
+  const [uploadingPdf, setUploadingPdf] = useState(false);
+  const [uploadError, setUploadError] = useState('');
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
   // Voice input state
   const recognitionRef = useRef(null);
+  const pdfInputRef = useRef(null);
   const [listeningField, setListeningField] = useState(null);
 
   const speak = (text) => {
@@ -183,6 +188,30 @@ const PatientForm = () => {
         ...prev,
         [name]: ''
       }));
+    }
+  };
+
+  const handlePdfUploadClick = () => {
+    setUploadError('');
+    pdfInputRef.current?.click();
+  };
+
+  const handlePdfSelected = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingPdf(true);
+    setUploadError('');
+    try {
+      const parsed = await importPreAuthPdf(file);
+      if (!parsed || typeof parsed !== 'object') throw new Error('No parsable data found');
+      setFormData((prev) => ({ ...prev, ...parsed }));
+    } catch (err) {
+      console.error('PDF import failed:', err);
+      setUploadError('Could not read that PDF. Please ensure it is a clear, text-based scan of the prior auth form.');
+    } finally {
+      setUploadingPdf(false);
+      // reset input so same file can be re-selected
+      if (pdfInputRef.current) pdfInputRef.current.value = '';
     }
   };
 
@@ -396,6 +425,45 @@ const PatientForm = () => {
 
   return (
     <div className="card w-full">
+          {/* Hidden PDF input */}
+          <input
+            ref={pdfInputRef}
+            type="file"
+            accept="application/pdf"
+            className="hidden"
+            onChange={handlePdfSelected}
+          />
+
+          {/* Import PDF button at the top */}
+          <div className="mb-6 flex justify-center">
+            <button
+              type="button"
+              onClick={handlePdfUploadClick}
+              disabled={uploadingPdf}
+              className="btn-primary flex items-center gap-2 disabled:opacity-60"
+              title="Import a Prior Authorization PDF to auto-fill the form"
+            >
+              {uploadingPdf ? (
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  Importing PDF...
+                </>
+              ) : (
+                <>
+                  <FileUp className="h-5 w-5" />
+                  Import PDF
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* Upload Error */}
+          {uploadError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+              <p className="text-red-700 text-sm">{uploadError}</p>
+            </div>
+          )}
+
           {/* Header */}
           <div className="text-center mb-8">
             <div className="bg-medical-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">

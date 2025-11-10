@@ -1,7 +1,36 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "title": "Patient Registration & Prior Authorization",
   "description": "Schema and defaults for PatientForm.jsx. Use this to drive rendering, validation, and exports.",
+  "features": {
+    "pdfImport": {
+      "enabled": true,
+      "label": "Import PDF",
+      "description": "Upload a scanned Prior Authorization PDF to auto-fill form fields",
+      "acceptedFileTypes": ["application/pdf"],
+      "importUtility": "../utils/pdfImport",
+      "position": "top",
+      "mappedFields": [
+        "healthPlan",
+        "healthPlanFax",
+        "name",
+        "dob",
+        "gender",
+        "address",
+        "email",
+        "phoneNumber",
+        "healthInsuranceId",
+        "patientAccountNumber",
+        "principalDiagnosisDescription",
+        "principalDiagnosisICD10"
+      ]
+    },
+    "voiceInput": {
+      "enabled": true,
+      "description": "Voice recognition input for text fields",
+      "supportedFields": ["name", "age", "gender", "address", "email", "phoneNumber", "medicalHistory"]
+    }
+  },
   "sections": [
     {
       "id": "insurance",
