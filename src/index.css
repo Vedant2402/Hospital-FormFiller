@@ -45,6 +45,13 @@
     box-shadow: 0 10px 30px rgb(2 132 199 / 0.08); /* subtle teal shadow */
   }
 
+  /* Animated card background (subtle moving gradient) */
+  .animated-card {
+    background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(240,248,255,0.7));
+    background-size: 200% 200%;
+    animation: cardShift 12s ease infinite;
+  }
+
   .glass-button {
     @apply bg-white/70 backdrop-blur-md border border-white/60 text-gray-900 font-semibold py-3 px-6 rounded-xl shadow-md transition-all duration-300;
   }
@@ -58,6 +65,13 @@
   }
 
   .min-h-dvh { min-height: 100dvh; }
+
+  /* Animated gradient background utility */
+  .animated-gradient {
+    background: linear-gradient(-45deg, #ffffff, #eef6ff, #f5faff, #e6fbff);
+    background-size: 400% 400%;
+    animation: gradientShift 18s ease infinite;
+  }
 }
 
 /* Tilt animation for gradient glow */
@@ -99,10 +113,22 @@
     to { opacity: 1; transform: scale(1) }
   }
 
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
   .anim-fade-in { animation: fadeIn 600ms ease-out both; }
   .anim-fade-up { animation: fadeUp 650ms ease-out both; }
   .anim-fade-scale { animation: fadeScale 700ms ease-out both; }
   .anim-delay-1 { animation-delay: .1s }
   .anim-delay-2 { animation-delay: .2s }
   .anim-delay-3 { animation-delay: .3s }
+}
+
+@keyframes cardShift {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 100% 100%; }
+  100% { background-position: 0% 0%; }
 }

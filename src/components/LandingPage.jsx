@@ -40,14 +40,21 @@ const LandingPage = () => {
         </section>
 
         
-        {/* Main Action */}
-  <section className="grid gap-9 md:gap-10 max-w-2xl mx-auto ar-card-grid anim-fade-scale anim-delay-1">
+        {/* Main Actions */}
+        <section className="grid gap-9 md:gap-10 max-w-3xl mx-auto ar-card-grid anim-fade-scale anim-delay-1" style={{gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))'}}>
           <GlassCard
             href="/patient-form"
             icon={<FileText className="h-12 w-12 text-medical-700" />}
             title="Patient Form"
             description="Submit your medical information securely through our online form."
             buttonText="Fill Out Form"
+          />
+          <GlassCard
+            href="/doctor-login"
+            icon={<Stethoscope className="h-12 w-12 text-primary-700" />}
+            title="Doctor Portal"
+            description="Sign in to review pre-authorization submissions and patient details."
+            buttonText="Go to Portal"
           />
         </section>
 
