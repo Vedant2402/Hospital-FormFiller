@@ -10,11 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-<<<<<<< HEAD
     "axios": "^1.13.2",
-=======
-    "firebase": "^12.3.0",
->>>>>>> parent of bb5032e (Added authentication api, added cors route in vite)
     "lucide-react": "^0.544.0",
     "pdfjs-dist": "^5.4.394",
     "react": "^19.1.1",

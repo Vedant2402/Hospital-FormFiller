@@ -8,6 +8,10 @@
     background-color: #ffffff;
     color: #111827; /* gray-900 */
   }
+  .dark body {
+    background-color: #0b1220;
+    color: #e5e7eb;
+  }
   html, body, #root { height: 100%; min-height: 100dvh; }
 }
 
@@ -24,7 +28,17 @@
   }
   
   .form-input {
-    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200;
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 bg-white;
+  }
+  .dark .form-input {
+    @apply bg-gray-800 border-gray-700 text-gray-100;
+  }
+
+  .input {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 bg-white;
+  }
+  .dark .input {
+    @apply bg-gray-800 border-gray-700 text-gray-100;
   }
   
   .form-label {
@@ -37,23 +51,36 @@
 
   /* Glassmorphism utilities */
   .glass-header {
-    @apply fixed top-0 inset-x-0 z-50 backdrop-blur-md bg-white/60 border-b border-white/40 shadow-sm;
+    @apply fixed top-0 inset-x-0 z-50 backdrop-blur-md bg-white/80 border-b border-gray-200/60 shadow-sm;
+  }
+  .dark .glass-header {
+    @apply bg-gray-900/80 border-gray-700/60;
   }
 
   .glass-card {
-    @apply bg-white/60 backdrop-blur-lg border border-white/50 shadow-lg rounded-2xl p-8;
-    box-shadow: 0 10px 30px rgb(2 132 199 / 0.08); /* subtle teal shadow */
+    @apply bg-white/85 backdrop-blur-lg border border-gray-200/70 shadow-lg rounded-2xl p-8;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+  .dark .glass-card {
+    @apply bg-gray-900/85 border-gray-700/70;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   }
 
   /* Animated card background (subtle moving gradient) */
   .animated-card {
-    background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(240,248,255,0.7));
+    background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,248,255,0.9));
     background-size: 200% 200%;
     animation: cardShift 12s ease infinite;
   }
+  .dark .animated-card {
+    background: linear-gradient(135deg, rgba(17, 24, 39, 0.9), rgba(31, 41, 55, 0.9));
+  }
 
   .glass-button {
-    @apply bg-white/70 backdrop-blur-md border border-white/60 text-gray-900 font-semibold py-3 px-6 rounded-xl shadow-md transition-all duration-300;
+    @apply bg-white/80 backdrop-blur-md border border-gray-300/60 text-gray-900 font-semibold py-3 px-6 rounded-xl shadow-md transition-all duration-300;
+  }
+  .dark .glass-button {
+    @apply bg-gray-800/80 border-gray-700/60 text-gray-100;
   }
 
   .hover-lift {
@@ -68,9 +95,12 @@
 
   /* Animated gradient background utility */
   .animated-gradient {
-    background: linear-gradient(-45deg, #ffffff, #eef6ff, #f5faff, #e6fbff);
+    background: linear-gradient(-45deg, #f0f9ff, #e0f2fe, #dbeafe, #bfdbfe);
     background-size: 400% 400%;
     animation: gradientShift 18s ease infinite;
+  }
+  .dark .animated-gradient {
+    background: linear-gradient(-45deg, #0b1220, #1e293b, #334155, #1e3a5f);
   }
 }
 

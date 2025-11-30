@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 // navigation handled via Link inside GlassCard
 import { Stethoscope, UserPlus, FileText, Mail, Phone } from 'lucide-react';
 import GlassCard from './GlassCard';
+import ThemeToggle from './ThemeToggle';
 
 const LandingPage = () => {
   // no local navigation needed
@@ -13,7 +14,7 @@ const LandingPage = () => {
       {/* Glass Header - fixed */}
       <header className="glass-header">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="h-16 flex items-center justify-center">
+          <div className="h-16 flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="bg-primary-600 p-2 rounded-lg shadow-sm">
                 <Stethoscope className="h-7 w-7 text-white" />
@@ -23,6 +24,7 @@ const LandingPage = () => {
                 <p className="hidden md:block text-xs text-gray-600">Minimal, secure, and professional</p>
               </div>
             </div>
+            <ThemeToggle />
           </div>
         </div>
       </header>
