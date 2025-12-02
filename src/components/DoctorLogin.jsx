@@ -1,126 +1,271 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ShieldCheck, Eye, EyeOff, Home, Stethoscope } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
+// import {
+//   signInWithEmailAndPassword,
+//   createUserWithEmailAndPassword,
+// } from "firebase/auth";
+// import { auth } from "../config/firebase";
+import { Stethoscope, Mail, Lock, ArrowLeft, Eye, EyeOff } from "lucide-react";
+import axios from "axios";
 
 const DoctorLogin = () => {
-  const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const [isLoginForm, setIsLoginForm] = useState(true);
 
   useEffect(() => {
-    const existing = localStorage.getItem('doctorUser');
-    if (existing) {
-      navigate('/doctor');
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      if (token && window.location.pathname !== "/doctor-dashboard") {
+        navigate("/doctor-dashboard");
+      }
     }
   }, [navigate]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setError('');
-    const demoUsers = [
-      { email: 'doctor@example.com', password: 'password123', name: 'Dr. Demo' },
-    ];
-    const user = demoUsers.find(u => u.email === email && u.password === password);
-    if (!user) {
-      setError('Invalid credentials. Try doctor@example.com / password123');
-      return;
+  const handleRegisterDoctor = async () => {
+    const apiUrl = "/api/auth/signup";
+    setLoading(true);
+    setError("");
+    try {
+      const res = await axios.post(apiUrl, {
+        email,
+        password,
+      });
+
+      if (res.status === 201 || res.status === 200) {
+        setError("Doctor account registered! You can now log in.");
+        setIsLoginForm(true);
+      } else {
+        setError(
+          "Registration failed: " + (res.data?.message || "Unexpected response")
+        );
+      }
+    } catch (err) {
+      const msg = err.response?.data?.message || err.message;
+      if (err.response?.status === 409) {
+        setError("Doctor account already exists. You can log in.");
+      } else {
+        setError("Registration failed: " + msg);
+      }
+    } finally {
+      setLoading(false);
     }
-    localStorage.setItem('doctorUser', JSON.stringify({ email: user.email, name: user.name, loggedInAt: new Date().toISOString() }));
-    navigate('/doctor');
   };
 
+  const handleLogin = async (e) => {
+    const apiUrl = "/api/auth/login";
+    if (e && typeof e.preventDefault === "function") e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    try {
+      const res = await axios.post(apiUrl, {
+        email,
+        password,
+      });
+
+      if (res.status === 200) {
+        // Store token if provided by backend
+        const { idToken, uid } = res.data || {};
+        if (idToken && uid) {
+          try {
+            localStorage.setItem("authToken", idToken);
+            localStorage.setItem("uid", uid);
+          } catch {
+            // ignore localStorage errors
+          }
+        }
+        navigate("/doctor-dashboard");
+      } else {
+        setError(
+          res.data?.message ||
+            "Login failed. Please check your credentials and try again."
+        );
+      }
+    } catch (err) {
+      const status = err.response?.status; // eslint-disable-line no-unused-vars
+      const msg = err.response?.data?.message || err.message;
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // (old firebase error mapper removed — HTTP status-based messages are used instead)
+
   return (
-    <div className="min-h-dvh animated-gradient">
-      {/* Header */}
-      <header className="glass-header">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="h-16 flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="bg-primary-600 p-2 rounded-lg shadow-sm">
-                <Stethoscope className="h-7 w-7 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl md:text-2xl font-bold text-gray-900">Doctor Portal</h1>
-                <p className="hidden md:block text-xs text-gray-600">Secure access to pre-authorization dashboard</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <a href="/" className="glass-button px-3 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg inline-flex items-center gap-2">
-                <Home className="h-5 w-5" /> Home
-              </a>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Centered Login Card */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-20" style={{ minHeight: 'calc(100dvh - 8rem)' }}>
-        {/* Back button above the sign-in card, left aligned */}
-        <div className="flex justify-start mb-4">
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            className="glass-button px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg inline-flex items-center gap-2"
-            aria-label="Go back"
+    <div className="min-h-dvh bg-gradient-to-br from-primary-50 via-white to-medical-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full">
+        {/* Back Button */}
+        <div className="mb-6">
+          <Link
+            to="/"
+            className="inline-flex items-center text-primary-600 hover:text-primary-700 transition-colors duration-200"
           >
-            <span className="font-semibold">&larr;</span>
-            <span>Back</span>
-          </button>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Home
+          </Link>
         </div>
 
-        <section className="flex items-center justify-center">
-          <div className="glass-card animated-card w-full max-w-md anim-fade-in">
-            <div className="flex items-center mb-4">
-              <div className="h-10 w-10 flex items-center justify-center rounded-full bg-primary-100 mr-3">
-                <ShieldCheck className="h-6 w-6 text-primary-600" />
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900">Sign in</h2>
+        {/* Login Card */}
+        <div className="card">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="bg-primary-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Stethoscope className="h-8 w-8 text-primary-600" />
             </div>
-            <p className="text-gray-600 mb-6">Enter your credentials to access the Pre-Authorization dashboard.</p>
-            {error && <div className="bg-red-50 text-red-700 rounded-md p-3 mb-4 text-sm">{error}</div>}
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <h2 className="text-3xl font-bold text-gray-900">
+              Doctor {isLoginForm ? "Login" : "Registration"}
+            </h2>
+            <p className="text-gray-600 mt-2">Access your medical dashboard</p>
+          </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+              <p className="text-red-700 text-sm">{error}</p>
+            </div>
+          )}
+
+          {/* Login Form */}
+          <form
+            onSubmit={isLoginForm ? handleLogin : handleRegisterDoctor}
+            className="space-y-6"
+          >
+            <div>
+              <label htmlFor="email" className="form-label">
+                Email Address
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Mail className="h-5 w-5 text-gray-400" />
+                </div>
                 <input
+                  id="email"
                   type="email"
-                  className="input h-14 text-lg px-4"
+                  required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="doctor@example.com"
-                  required
+                  className="form-input pl-10"
+                  placeholder="doctor@hospital.com"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    className="input h-14 text-lg pr-12 px-4"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter password"
-                    required
-                  />
-                  <button type="button" className="absolute right-3 top-3 text-gray-500" onClick={() => setShowPassword(!showPassword)}>
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                  </button>
-                </div>
-              </div>
-              <button type="submit" className="btn-primary w-full h-12 text-base">Sign In</button>
-              <p className="text-xs text-gray-500 mt-2">Demo login: doctor@example.com / password123</p>
-            </form>
-          </div>
-        </section>
-      </main>
+            </div>
 
-      {/* Footer */}
-      <footer className="py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-500 text-sm">
-          © 2025 HealthCare Portal
+            <div>
+              <label htmlFor="password" className="form-label">
+                Password
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="form-input pl-10 pr-10"
+                  placeholder="Enter your password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  ) : (
+                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                  {isLoginForm ? "Signing In..." : "Registering..."}
+                </div>
+              ) : isLoginForm ? (
+                "Sign In"
+              ) : (
+                "Register"
+              )}
+            </button>
+
+            {/* Change to Register/Login Link */}
+            {
+              <div className="text-center">
+                <p className="text-sm text-gray-600">
+                  {isLoginForm
+                    ? "Don't have an account?"
+                    : "Already have an account?"}{" "}
+                  <button
+                    type="button"
+                    onClick={() => setIsLoginForm(!isLoginForm)}
+                    className="text-primary-600 hover:text-primary-700 font-medium"
+                  >
+                    {isLoginForm ? "Register" : "Login"}
+                  </button>
+                </p>
+              </div>
+            }
+          </form>
+
+          {/* Demo Credentials & Register Button */}
+          {/* <div className="mt-8 p-4 bg-gray-50 rounded-lg">
+            <h4 className="text-sm font-medium text-gray-900 mb-2">
+              Demo Credentials:
+            </h4>
+            <p className="text-sm text-gray-600">
+              Email:{" "}
+              <code className="bg-white px-2 py-1 rounded">
+                doctor@demo.com
+              </code>
+            </p>
+            <p className="text-sm text-gray-600">
+              Password:{" "}
+              <code className="bg-white px-2 py-1 rounded">demo123</code>
+            </p>
+            <button
+              type="button"
+              onClick={() => handleRegisterDoctor()}
+              className="btn-primary w-full mt-4"
+              disabled={loading}
+            >
+              {loading ? "Registering..." : "Register Doctor Demo Account"}
+            </button>
+            <p className="text-xs text-gray-500 mt-2">
+              Note: Click to create this account via the backend API for
+              testing. Remove after registration.
+            </p>
+          </div> */}
         </div>
-      </footer>
+
+        {/* Additional Info */}
+        <div className="text-center mt-6">
+          <p className="text-sm text-gray-600">
+            Having trouble accessing your account?{" "}
+            <a
+              href="#"
+              className="text-primary-600 hover:text-primary-700 font-medium"
+            >
+              Contact IT Support
+            </a>
+          </p>
+        </div>
+      </div>
     </div>
   );
 };
