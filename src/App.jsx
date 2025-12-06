@@ -12,6 +12,7 @@ import DoctorLogin from "./components/DoctorLogin";
 import PatientFormPage from "./components/PatientFormPage";
 import ConfirmationPage from "./components/ConfirmationPage";
 import DoctorDashboard from "./components/DoctorDashboard";
+import { fetchAuthTokenAndUid } from "./config/cookies";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -28,7 +29,7 @@ const ProtectedRoute = ({ children }) => {
   //   );
   // }
 
-  const token = localStorage.getItem("authToken");
+  const { authToken: token } = fetchAuthTokenAndUid();
 
   if (!token) {
     return <Navigate to="/doctor-login" />;

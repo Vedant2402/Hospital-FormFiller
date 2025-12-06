@@ -1,12 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-// import {
-//   signInWithEmailAndPassword,
-//   createUserWithEmailAndPassword,
-// } from "firebase/auth";
-// import { auth } from "../config/firebase";
 import { Stethoscope, Mail, Lock, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import axios from "axios";
+import { setAuthTokenAndUid, fetchAuthTokenAndUid } from "../config/cookies";
 
 const DoctorLogin = () => {
   const [email, setEmail] = useState("");
@@ -18,13 +14,12 @@ const DoctorLogin = () => {
   const [isLoginForm, setIsLoginForm] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
+    const { authToken: token } = fetchAuthTokenAndUid();
+
     if (token) {
-      if (token && window.location.pathname !== "/doctor-dashboard") {
-        navigate("/doctor-dashboard");
-      }
+      navigate("/doctor-dashboard");
     }
-  }, [navigate]);
+  }, []);
 
   const handleRegisterDoctor = async () => {
     const apiUrl = "/api/auth/signup";
@@ -72,12 +67,7 @@ const DoctorLogin = () => {
         // Store token if provided by backend
         const { idToken, uid } = res.data || {};
         if (idToken && uid) {
-          try {
-            localStorage.setItem("authToken", idToken);
-            localStorage.setItem("uid", uid);
-          } catch {
-            // ignore localStorage errors
-          }
+          setAuthTokenAndUid(idToken, uid);
         }
         navigate("/doctor-dashboard");
       } else {
