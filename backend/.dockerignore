@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.sqlite3
+.env
+serviceAccountKey.json
+model_cache/
+.gitignore
+.DS_Store
+README.md

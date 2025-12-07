@@ -1,0 +1,16 @@
+services:
+  flask-backend:
+    build: .
+    container_name: flask-backend
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./databases:/app/databases
+      - ./chroma_icd:/app/chroma_icd
+      - ./data:/app/data
+      - ./temp:/app/temp
+      - ./serviceAccountKey.json:/app/serviceAccountKey.json:ro
+      - /Users/ymac/.cache/huggingface/hub:/root/.cache/huggingface/hub:rw
+    env_file:
+      - .env
+    restart: unless-stopped

@@ -1,0 +1,12 @@
+.env
+*.pyc
+*.pdf
+*.txt
+temp/
+/databases/
+serviceAccountKey.json
+model_cache/
+instance/
+.DS_Store
+chroma_icd/
+data/
