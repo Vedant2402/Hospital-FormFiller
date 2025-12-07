@@ -47,7 +47,7 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/doctor-login" element={<DoctorLogin />} />
           <Route path="/patient-form" element={<PatientFormPage />} />
-          <Route path="/confirmation/:id?" element={<ConfirmationPage />} />
+          <Route path="/confirmation" element={<ConfirmationPage />} />
 
           {/* Protected Routes */}
           <Route
