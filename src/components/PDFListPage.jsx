@@ -13,6 +13,9 @@ const PDFListPage = () => {
 
   const fetchPdfs = async () => {
     resetError();
+    setLoading(true);
+    const { uid } = await fetchAuthTokenAndUid();
+    setUserUid(uid);
     try {
       const response = await fetch(getByUidUrl);
       if (!response.ok) {
@@ -28,18 +31,11 @@ const PDFListPage = () => {
   };
 
   useEffect(() => {
-    const { uid } = fetchAuthTokenAndUid();
     const pdfData = sessionStorage.getItem("pdf");
     if (pdfData && pdfData !== "undefined") {
       setSelectedFile(JSON.parse(pdfData));
     }
-    if (uid) {
-      setUserUid(uid);
-      fetchPdfs();
-    } else {
-      setError("User not authenticated");
-      setLoading(false);
-    }
+    fetchPdfs();
   }, [getByUidUrl]);
 
   const handleUpload = async (file) => {

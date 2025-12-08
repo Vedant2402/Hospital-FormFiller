@@ -17,6 +17,7 @@ import { fetchAuthTokenAndUid } from "../config/cookies.js";
 const DoctorDashboard = () => {
   const navigate = useNavigate();
   const [error, setError] = useState(null);
+  // eslint-disable-next-line no-unused-vars
   const [selectedFile, setSelectedFile] = useState(null);
 
   useEffect(() => {
