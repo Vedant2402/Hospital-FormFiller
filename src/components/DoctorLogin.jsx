@@ -67,7 +67,7 @@ const DoctorLogin = () => {
         // Store token if provided by backend
         const { idToken, uid } = res.data || {};
         if (idToken && uid) {
-          setAuthTokenAndUid(idToken, uid);
+          await setAuthTokenAndUid(idToken, uid);
         }
         navigate("/doctor-dashboard");
       } else {

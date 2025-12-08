@@ -1,4 +1,4 @@
-const setAuthTokenAndUid = (token, uid) => {
+const setAuthTokenAndUid = async (token, uid) => {
   try {
     const expiryTime = Date.now() + 60 * 60 * 1000; // 1 hour from now
 
