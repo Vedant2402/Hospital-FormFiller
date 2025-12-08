@@ -9,12 +9,17 @@ from firebase_admin import credentials, auth
 def create_app():
     app = Flask(__name__)
 
-    app.secret_key = os.environ["FLASK_SECRET_KEY"]
+    app.secret_key = os.environ.get("FLASK_SECRET_KEY", "dev-secret-key-change-in-production")
 
     try:
-        cred = credentials.Certificate("/app/serviceAccountKey.json")
-        firebase_admin.initialize_app(cred)
-        print("✅ Firebase Admin initialized successfully.")
+        # Look for serviceAccountKey.json in backend folder
+        service_account_path = os.path.join(os.path.dirname(__file__), '..', 'serviceAccountKey.json')
+        if os.path.exists(service_account_path):
+            cred = credentials.Certificate(service_account_path)
+            firebase_admin.initialize_app(cred)
+            print("✅ Firebase Admin initialized successfully.")
+        else:
+            print(f"⚠️  serviceAccountKey.json not found at {service_account_path}")
     except Exception as e:
         print(f"❌ Error initializing Firebase Admin: {e}")
                 
