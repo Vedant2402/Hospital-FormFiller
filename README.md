@@ -27,6 +27,10 @@ A comprehensive hospital form management system with separate interfaces for doc
 - **Icons**: Lucide React
 - **Routing**: React Router DOM
 
+
+<img width="1180" height="1167" alt="image" src="https://github.com/user-attachments/assets/f5dd80ea-7127-4b8d-a9d4-702351968ece" />
+
+
 ## Setup Instructions
 
 ### 1. Firebase Configuration
